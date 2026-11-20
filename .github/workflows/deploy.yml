@@ -41,7 +41,7 @@ jobs:
     needs: ci-test
     runs-on: ubuntu-latest
     outputs:
-      image_uri: ${{ steps.meta.outputs.image_uri }}
+      image_tag: ${{ steps.meta.outputs.image_tag }}
       app_version: ${{ steps.meta.outputs.app_version }}
     steps:
       - name: Checkout del código fuente
@@ -81,6 +81,7 @@ jobs:
             -t "$IMAGE_LATEST" \
             .
 
+          echo "image_tag=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
           echo "image_uri=${IMAGE_URI}" >> "$GITHUB_OUTPUT"
           echo "image_latest=${IMAGE_LATEST}" >> "$GITHUB_OUTPUT"
           echo "app_version=${APP_VERSION}" >> "$GITHUB_OUTPUT"
@@ -128,10 +129,18 @@ jobs:
             --name "${{ secrets.EKS_CLUSTER_NAME }}"
 
       - name: Aplicar manifiestos y desplegar nueva imagen en Kubernetes
+        id: k8s-deploy
         env:
-          IMAGE_URI: ${{ needs.build-and-push-ecr.outputs.image_uri }}
+          IMAGE_TAG: ${{ needs.build-and-push-ecr.outputs.image_tag }}
           APP_VERSION: ${{ needs.build-and-push-ecr.outputs.app_version }}
         run: |
+          REPO_URI=$(aws ecr describe-repositories \
+            --repository-names "$ECR_REPOSITORY" \
+            --query 'repositories[0].repositoryUri' \
+            --output text)
+          IMAGE_URI="${REPO_URI}:${IMAGE_TAG}"
+          echo "image_uri=${IMAGE_URI}" >> "$GITHUB_OUTPUT"
+
           kubectl apply -f k8s/01-namespace.yaml
           kubectl apply -f k8s/02-configmap.yaml
 
@@ -162,7 +171,7 @@ jobs:
 
           echo "============================================================"
           echo "Despliegue completado en EKS: ${{ secrets.EKS_CLUSTER_NAME }}"
-          echo "Imagen desplegada : ${{ needs.build-and-push-ecr.outputs.image_uri }}"
+          echo "Imagen desplegada : ${{ steps.k8s-deploy.outputs.image_uri }}"
           echo "Version activa    : ${{ needs.build-and-push-ecr.outputs.app_version }}"
           if [ -n "$LB_ENDPOINT" ]; then
             echo "URL Frontend      : http://${LB_ENDPOINT}"
@@ -173,11 +182,10 @@ jobs:
 
           {
             echo "## Despliegue Exitoso en Amazon EKS"
-            echo "- **Clúster EKS**: \`${{ secrets.EKS_CLUSTER_NAME }}\` (\`${{ secrets.AWS_REGION }}\`)"
             echo "- **Namespace**: \`${K8S_NAMESPACE}\`"
             echo "- **Versión**: \`${{ needs.build-and-push-ecr.outputs.app_version }}\`"
-            echo "- **Imagen en ECR**: \`${{ needs.build-and-push-ecr.outputs.image_uri }}\`"
+            echo "- **Repositorio ECR**: \`${ECR_REPOSITORY}:${{ needs.build-and-push-ecr.outputs.image_tag }}\`"
             if [ -n "$LB_ENDPOINT" ]; then
-              echo "- **URL Pública del Landing**: http://${LB_ENDPOINT}"
+              echo "- **URL Pública del Landing**: \`http://${LB_ENDPOINT}\` *(si GitHub oculta la región con \`***\`, reemplaza \`***\` por tu región de AWS)*"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
