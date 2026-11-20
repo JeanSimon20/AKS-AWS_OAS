@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: orbitcloud
+  labels:
+    app.kubernetes.io/name: orbitcloud-landing
+    app.kubernetes.io/managed-by: github-actions

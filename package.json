@@ -1,0 +1,14 @@
+{
+  "name": "orbitcloud-landing",
+  "version": "1.0.0",
+  "description": "Landing Page Frontend de prueba preparada para contenedorizacion en Amazon ECR y orquestacion en Kubernetes (EKS)",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/*.test.js"
+  }
+}

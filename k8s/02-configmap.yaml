@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orbitcloud-config
+  namespace: orbitcloud
+data:
+  APP_ENV: "aws-eks-production"
+  BANNER_MESSAGE: "Desplegado automaticamente por CI/CD desde Amazon ECR hacia Amazon EKS"

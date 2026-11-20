@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OrbitCloud — Plataforma Cloud & Orquestación Moderna</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Barra superior de estado Cloud -->
+  <div class="top-banner" id="topBanner">
+    <span class="pulse-dot"></span>
+    <span id="bannerText">Cargando telemetría del contenedor...</span>
+  </div>
+
+  <!-- Navegación -->
+  <header class="navbar container">
+    <a href="#" class="brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect width="28" height="28" rx="8" fill="url(#grad)" />
+        <path d="M8 15.5L12.5 20L20.5 9.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+        <defs>
+          <linearGradient id="grad" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#38BDF8" />
+            <stop offset="1" stop-color="#6366F1" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <span>Orbit<strong>Cloud</strong></span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="#soluciones">Soluciones</a>
+      <a href="#orquestacion">Monitor de Pods</a>
+      <a href="#planes">Planes</a>
+    </nav>
+
+    <div class="nav-meta">
+      <span class="version-pill" id="navVersion">v1.0.0</span>
+      <a href="#orquestacion" class="btn btn-sm btn-outline">Ver Nodo Activo</a>
+    </div>
+  </header>
+
+  <!-- Hero Principal -->
+  <main>
+    <section class="hero container">
+      <div class="hero-badge">Arquitectura Cloud-Native · AWS ECR &amp; Kubernetes</div>
+      <h1>
+        Despliega aplicaciones modernas <br />
+        <span class="gradient-text">de tu entorno local a la nube</span>
+      </h1>
+      <p class="hero-subtitle">
+        Plataforma de demostración frontend diseñada para validar pipelines de integración continua,
+        registro de contenedores en Amazon ECR y alta disponibilidad sobre clústeres de Kubernetes.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#orquestacion" class="btn btn-primary">Probar Balanceo de Pods</a>
+        <a href="#soluciones" class="btn btn-secondary">Explorar Arquitectura</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <strong>99.99%</strong>
+          <span>Disponibilidad SLA</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <strong>Zero-Downtime</strong>
+          <span>Rolling Updates en K8s</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <strong>Non-Root</strong>
+          <span>Contenedor Seguro DevSecOps</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel en Vivo de Orquestación (Ideal para demostrar Kubernetes en clase) -->
+    <section id="orquestacion" class="container section">
+      <div class="cluster-panel">
+        <div class="cluster-header">
+          <div>
+            <span class="eyebrow">TELEMETRÍA EN TIEMPO REAL</span>
+            <h2>Inspector de Contenedor / Pod en Kubernetes</h2>
+            <p>
+              Cuando escales tu <code>Deployment</code> en Kubernetes (ej. <code>replicas: 3</code>),
+              lanza una ráfaga aquí para observar cómo el <code>Service</code> reparte el tráfico entre distintos Pods.
+            </p>
+          </div>
+          <div class="cluster-controls">
+            <button id="btnRefresh" class="btn btn-secondary">Consultar 1 vez</button>
+            <button id="btnBurst" class="btn btn-primary">Simular Ráfaga (x12)</button>
+          </div>
+        </div>
+
+        <div class="telemetry-grid">
+          <div class="telemetry-card highlight-card">
+            <span class="t-label">Pod / Hostname que respondió</span>
+            <strong class="t-value mono" id="podName">—</strong>
+            <span class="t-sub"><code>os.hostname()</code> del contenedor</span>
+          </div>
+
+          <div class="telemetry-card">
+            <span class="t-label">Versión de Imagen</span>
+            <strong class="t-value" id="appVersion">—</strong>
+            <span class="t-sub">Variable <code>APP_VERSION</code></span>
+          </div>
+
+          <div class="telemetry-card">
+            <span class="t-label">Entorno Activo</span>
+            <strong class="t-value" id="appEnv">—</strong>
+            <span class="t-sub">Variable <code>APP_ENV</code></span>
+          </div>
+
+          <div class="telemetry-card">
+            <span class="t-label">Tiempo Activo (Uptime)</span>
+            <strong class="t-value" id="podUptime">—</strong>
+            <span class="t-sub" id="healthStatus">Healthcheck: Verificando...</span>
+          </div>
+        </div>
+
+        <div class="replicas-box">
+          <div class="replicas-title">
+            <span>Pods descubiertos durante esta sesión (<strong id="uniquePodsCount">0</strong>)</span>
+            <button id="btnResetStats" class="link-btn">Reiniciar conteo</button>
+          </div>
+          <div id="podsDistribution" class="pods-list">
+            <span class="muted">Realizando primera consulta...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección de Características del Landing -->
+    <section id="soluciones" class="container section">
+      <div class="section-heading">
+        <span class="eyebrow"> FLUJO DE LOCAL A NUBE</span>
+        <h2>Todo lo que valida esta plantilla en tu laboratorio</h2>
+      </div>
+
+      <div class="features-grid">
+        <article class="feature-card">
+          <div class="feature-icon">01</div>
+          <h3>Empaquetado Ligero</h3>
+          <p>
+            Imagen basada en <code>node:22-alpine</code> sin dependencias externas pesadas, logrando builds de pocos segundos en tu pipeline CI/CD.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">02</div>
+          <h3>Seguridad DevSecOps</h3>
+          <p>
+            Ejecución bajo usuario sin privilegios (<code>USER node</code>), cabeceras HTTP seguras y superficie mínima para superar escaneos en Amazon ECR.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">03</div>
+          <h3>Sondas Nativas K8s</h3>
+          <p>
+            Incluye endpoints <code>/healthz</code> y <code>/readyz</code> listos para conectar con <code>livenessProbe</code> y <code>readinessProbe</code> en tu clúster.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Sección de Planes (Estética SaaS clásica para probar cambios visuales en CI/CD) -->
+    <section id="planes" class="container section">
+      <div class="section-heading">
+        <span class="eyebrow">ESCALABILIDAD BAJO DEMANDA</span>
+        <h2>Planes de Infraestructura Cloud</h2>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="price-card">
+          <h3>Developer Sandbox</h3>
+          <p class="price"><span>$0</span>/mes</p>
+          <ul>
+            <li>1 Réplica en entorno de desarrollo</li>
+            <li>Despliegue automatizado desde Git</li>
+            <li>Monitoreo básico de salud</li>
+          </ul>
+          <button class="btn btn-outline full-width toast-trigger" data-plan="Developer Sandbox">Seleccionar Plan</button>
+        </div>
+
+        <div class="price-card featured">
+          <div class="popular-tag">Recomendado Producción</div>
+          <h3>Kubernetes Cluster Pro</h3>
+          <p class="price"><span>$49</span>/mes</p>
+          <ul>
+            <li>Auto-escalado Horizontal (HPA)</li>
+            <li>Registro privado en Amazon ECR</li>
+            <li>Balanceo de carga multi-zona</li>
+          </ul>
+          <button class="btn btn-primary full-width toast-trigger" data-plan="Kubernetes Cluster Pro">Comenzar Ahora</button>
+        </div>
+
+        <div class="price-card">
+          <h3>Enterprise Zero-Trust</h3>
+          <p class="price"><span>$199</span>/mes</p>
+          <ul>
+            <li>Políticas de red y seguridad avanzada</li>
+            <li>Auditoría continua de vulnerabilidades</li>
+            <li>Soporte de arquitectura 24/7</li>
+          </ul>
+          <button class="btn btn-outline full-width toast-trigger" data-plan="Enterprise Zero-Trust">Contactar Ventas</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <footer class="footer container">
+    <p>© 2026 OrbitCloud · Plantilla Frontend para Laboratorio DevOps / AWS ECR / Kubernetes</p>
+    <p class="mono" id="footerMeta">Estado: Conectando...</p>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
