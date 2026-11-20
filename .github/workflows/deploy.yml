@@ -85,15 +85,17 @@ jobs:
           echo "image_latest=${IMAGE_LATEST}" >> "$GITHUB_OUTPUT"
           echo "app_version=${APP_VERSION}" >> "$GITHUB_OUTPUT"
 
-      - name: Escaneo DevSecOps de vulnerabilidades en imagen (Trivy)
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: ${{ steps.meta.outputs.image_uri }}
-          format: "table"
-          exit-code: "0"
-          ignore-unfixed: true
-          vuln-type: "os,library"
-          severity: "CRITICAL,HIGH"
+      - name: Escaneo DevSecOps de vulnerabilidades en imagen (Trivy desde AWS Public ECR)
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            public.ecr.aws/aquasecurity/trivy:latest image \
+            --format table \
+            --exit-code 0 \
+            --ignore-unfixed \
+            --scanners vuln \
+            --severity HIGH,CRITICAL \
+            "${{ steps.meta.outputs.image_uri }}"
 
       - name: Publicar imagen en Amazon ECR (SHA + latest)
         run: |
